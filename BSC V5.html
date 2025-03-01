@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanced Scorecard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --green-color: #a5d6a7;
+            --yellow-color: #ffe082;
+            --red-color: #ef9a9a;
+            --light-blue: #e3f2fd;
+            --primary-blue: #1976d2;
+            --dark-blue: #1565c0;
+            --light-green: #c8e6c9;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding-bottom: 50px;
+        }
+        
+        .header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scorecard-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .table th {
+            background-color: var(--light-blue);
+            font-weight: 600;
+        }
+        
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+        
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+        
+        .btn-add-row {
+            margin-top: 10px;
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-add-row:hover {
+            background-color: var(--dark-blue);
+            border-color: var(--dark-blue);
+        }
+        
+        .btn-remove {
+            color: #dc3545;
+            cursor: pointer;
+        }
+        
+        .green {
+            background-color: var(--green-color) !important;
+        }
+        
+        .yellow {
+            background-color: var(--yellow-color) !important;
+        }
+        
+        .red {
+            background-color: var(--red-color) !important;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 3px;
+        }
+        
+        .editable {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        
+        .editable:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions {
+            background-color: #e8f5e9;
+            border-left: 4px solid #43a047;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .instructions h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        .instructions ul {
+            margin-bottom: 0;
+        }
+        
+        .strategy-cell {
+            background-color: var(--light-green);
+        }
+        
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+        
+        @media print {
+            .btn-add-row, .btn-remove, .action-buttons {
+                display: none;
+            }
+            
+            body {
+                background-color: white;
+            }
+            
+            .scorecard-container {
+                box-shadow: none;
+                margin-bottom: 20px;
+            }
+            
+            .header {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <h1><i class="fas fa-chart-line me-2"></i>Balanced Scorecard</h1>
+        <p class="mb-0">Herramienta de gestión estratégica para monitorear el desempeño organizacional</p>
+    </div>
+
+    <div class="container">
+        <!-- Instrucciones -->
+        <div class="instructions">
+            <h4><i class="fas fa-info-circle me-2"></i>Instrucciones de Uso</h4>
+            <p>El Balanced Scorecard (BSC) es una herramienta de gestión estratégica que le permite monitorear el desempeño de su organización desde cuatro perspectivas clave.</p>
+            <ul>
+                <li><strong>Para editar:</strong> Haga clic en cualquier celda para modificar su contenido.</li>
+                <li><strong>Para agregar filas:</strong> Utilice el botón "Agregar Fila" debajo de cada tabla.</li>
+                <li><strong>Para eliminar filas:</strong> Haga clic en el icono <i class="fas fa-times text-danger"></i> al final de cada fila.</li>
+                <li><strong>Los colores:</strong> Indican el rendimiento según las metas establecidas (verde = bueno, amarillo = precaución, rojo = alerta).</li>
+                <li><strong>Guardar:</strong> Use el botón "Guardar" para almacenar sus datos localmente en su navegador.</li>
+                <li><strong>Reiniciar:</strong> Use el botón "Reiniciar" para borrar todos los datos y comenzar de nuevo.</li>
+                <li><strong>Imprimir:</strong> Use el botón "Imprimir" para obtener una versión imprimible del BSC.</li>
+            </ul>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Título del BSC</span>
+                    <input type="text" id="bsc-title" class="form-control" value="Balanced Scorecard">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Periodo</span>
+                    <input type="month" id="bsc-period" class="form-control" value="2025-03">
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons text-end">
+            <button class="btn btn-success" onclick="saveData()"><i class="fas fa-save me-2"></i>Guardar</button>
+            <button class="btn btn-danger" onclick="resetBSC()"><i class="fas fa-trash-alt me-2"></i>Reiniciar</button>
+            <button class="btn btn-info" onclick="printBSC()"><i class="fas fa-print me-2"></i>Imprimir</button>
+        </div>
+
+        <!-- Perspectiva Financiera -->
+        <div class="scorecard-container">
+            <h3 class="section-title"><i class="fas fa-dollar-sign me-2"></i>FINANCIERA</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="financial-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%">Estrategia</th>
+                            <th style="width: 25%">Medida</th>
+                            <th style="width: 12%">Monthly Target</th>
+                            <th style="width: 12%">Monthly Actual</th>
+                            <th style="width: 12%">YTD Target</th>
+                            <th style="width: 12%">YTD Actual</th>
+                            <th style="width: 2%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Incrementar Beneficios</td>
+                            <td contenteditable="true" class="editable">Margen de Beneficio Neto</td>
+                            <td contenteditable="true" class="editable target">15%</td>
+                            <td contenteditable="true" class="editable actual">16%</td>
+                            <td contenteditable="true" class="editable ytd-target">10%</td>
+                            <td contenteditable="true" class="editable ytd-actual">12%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Reducir Costos</td>
+                            <td contenteditable="true" class="editable">Costos Operativos</td>
+                            <td contenteditable="true" class="editable target">$50,000</td>
+                            <td contenteditable="true" class="editable actual">$48,000</td>
+                            <td contenteditable="true" class="editable ytd-target">$600,000</td>
+                            <td contenteditable="true" class="editable ytd-actual">$580,000</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary btn-add-row" onclick="addRow('financial-table')">
+                <i class="fas fa-plus me-1"></i> Agregar Fila
+            </button>
+        </div>
+
+        <!-- Perspectiva de Cliente -->
+        <div class="scorecard-container">
+            <h3 class="section-title"><i class="fas fa-users me-2"></i>CLIENTE</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="customer-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%">Estrategia</th>
+                            <th style="width: 25%">Medida</th>
+                            <th style="width: 12%">Monthly Target</th>
+                            <th style="width: 12%">Monthly Actual</th>
+                            <th style="width: 12%">YTD Target</th>
+                            <th style="width: 12%">YTD Actual</th>
+                            <th style="width: 2%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Mejorar Satisfacción</td>
+                            <td contenteditable="true" class="editable">Satisfacción del Cliente</td>
+                            <td contenteditable="true" class="editable target">85%</td>
+                            <td contenteditable="true" class="editable actual">87%</td>
+                            <td contenteditable="true" class="editable ytd-target">80%</td>
+                            <td contenteditable="true" class="editable ytd-actual">82%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Retener Clientes</td>
+                            <td contenteditable="true" class="editable">Tasa de Retención</td>
+                            <td contenteditable="true" class="editable target">92%</td>
+                            <td contenteditable="true" class="editable actual">90%</td>
+                            <td contenteditable="true" class="editable ytd-target">90%</td>
+                            <td contenteditable="true" class="editable ytd-actual">89%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary btn-add-row" onclick="addRow('customer-table')">
+                <i class="fas fa-plus me-1"></i> Agregar Fila
+            </button>
+        </div>
+
+        <!-- Perspectiva de Procesos Internos -->
+        <div class="scorecard-container">
+            <h3 class="section-title"><i class="fas fa-cogs me-2"></i>PROCESOS INTERNOS</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="internal-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%">Estrategia</th>
+                            <th style="width: 25%">Medida</th>
+                            <th style="width: 12%">Monthly Target</th>
+                            <th style="width: 12%">Monthly Actual</th>
+                            <th style="width: 12%">YTD Target</th>
+                            <th style="width: 12%">YTD Actual</th>
+                            <th style="width: 2%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Optimizar Producción</td>
+                            <td contenteditable="true" class="editable">Eficiencia de Producción</td>
+                            <td contenteditable="true" class="editable target">75%</td>
+                            <td contenteditable="true" class="editable actual">78%</td>
+                            <td contenteditable="true" class="editable ytd-target">70%</td>
+                            <td contenteditable="true" class="editable ytd-actual">73%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Reducir Desperdicios</td>
+                            <td contenteditable="true" class="editable">Porcentaje de Desperdicio</td>
+                            <td contenteditable="true" class="editable target">5.0%</td>
+                            <td contenteditable="true" class="editable actual">4.5%</td>
+                            <td contenteditable="true" class="editable ytd-target">7.0%</td>
+                            <td contenteditable="true" class="editable ytd-actual">6.0%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary btn-add-row" onclick="addRow('internal-table')">
+                <i class="fas fa-plus me-1"></i> Agregar Fila
+            </button>
+        </div>
+
+        <!-- Perspectiva de Aprendizaje y Crecimiento -->
+        <div class="scorecard-container">
+            <h3 class="section-title"><i class="fas fa-lightbulb me-2"></i>INNOVACIÓN Y APRENDIZAJE</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered" id="innovation-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%">Estrategia</th>
+                            <th style="width: 25%">Medida</th>
+                            <th style="width: 12%">Monthly Target</th>
+                            <th style="width: 12%">Monthly Actual</th>
+                            <th style="width: 12%">YTD Target</th>
+                            <th style="width: 12%">YTD Actual</th>
+                            <th style="width: 2%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Aumentar Innovaciones</td>
+                            <td contenteditable="true" class="editable">Nuevos Productos Desarrollados</td>
+                            <td contenteditable="true" class="editable target">3</td>
+                            <td contenteditable="true" class="editable actual">2</td>
+                            <td contenteditable="true" class="editable ytd-target">20</td>
+                            <td contenteditable="true" class="editable ytd-actual">18</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell">Mejorar Eficiencia I+D</td>
+                            <td contenteditable="true" class="editable">Gasto I+D vs. Ingresos (%)</td>
+                            <td contenteditable="true" class="editable target">6.0%</td>
+                            <td contenteditable="true" class="editable actual">5.5%</td>
+                            <td contenteditable="true" class="editable ytd-target">6.0%</td>
+                            <td contenteditable="true" class="editable ytd-actual">5.3%</td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary btn-add-row" onclick="addRow('innovation-table')">
+                <i class="fas fa-plus me-1"></i> Agregar Fila
+            </button>
+        </div>
+
+        <!-- Leyenda del Mapa de Calor -->
+        <div class="scorecard-container">
+            <h3 class="section-title"><i class="fas fa-info-circle me-2"></i>INDICADORES DEL MAPA DE CALOR</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <div class="legend-color green"></div>
+                        <div>Valores Actuales mensuales/YTD cumplen o superan las Metas.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <div class="legend-color yellow"></div>
+                        <div>Valores Actuales mensuales/YTD están dentro del 10% de las Metas.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="legend-item">
+                        <div class="legend-color red"></div>
+                        <div>Valores Actuales mensuales/YTD están más del 10% por debajo de las Metas.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función para agregar una nueva fila a una tabla
+        function addRow(tableId) {
+            const table = document.getElementById(tableId);
+            const tbody = table.querySelector('tbody');
+            const newRow = document.createElement('tr');
+            
+            newRow.innerHTML = `
+                <td contenteditable="true" class="editable strategy-cell"></td>
+                <td contenteditable="true" class="editable"></td>
+                <td contenteditable="true" class="editable target"></td>
+                <td contenteditable="true" class="editable actual"></td>
+                <td contenteditable="true" class="editable ytd-target"></td>
+                <td contenteditable="true" class="editable ytd-actual"></td>
+                <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+            `;
+            
+            tbody.appendChild(newRow);
+            
+            // Agregar evento a las celdas editables para actualizar colores cuando cambie el contenido
+            newRow.querySelectorAll('.editable').forEach(cell => {
+                cell.addEventListener('blur', updateColors);
+            });
+            
+            updateColors();
+        }
+        
+        // Función para eliminar una fila
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+        
+        // Función para aplicar colores según los valores
+        function updateColors() {
+            const tables = ['financial-table', 'customer-table', 'internal-table', 'innovation-table'];
+            
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const monthlyTargetCell = row.querySelector('.target');
+                    const monthlyActualCell = row.querySelector('.actual');
+                    const ytdTargetCell = row.querySelector('.ytd-target');
+                    const ytdActualCell = row.querySelector('.ytd-actual');
+                    
+                    // Procesar celdas mensuales
+                    if (monthlyTargetCell && monthlyActualCell) {
+                        const monthlyTargetText = monthlyTargetCell.textContent.trim();
+                        const monthlyActualText = monthlyActualCell.textContent.trim();
+                        
+                        if (monthlyTargetText && monthlyActualText) {
+                            const measureText = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                            const isLowerBetter = monthlyTargetText.includes('$') || 
+                                                measureText.includes('cost') || 
+                                                measureText.includes('waste') ||
+                                                measureText.includes('desperdicio') ||
+                                                measureText.includes('gasto');
+                            
+                            const monthlyTarget = parseFloat(monthlyTargetText.replace(/[^0-9.-]+/g, ''));
+                            const monthlyActual = parseFloat(monthlyActualText.replace(/[^0-9.-]+/g, ''));
+                            
+                            // Limpiar clases anteriores
+                            monthlyActualCell.classList.remove('green', 'yellow', 'red');
+                            
+                            if (!isNaN(monthlyTarget) && !isNaN(monthlyActual)) {
+                                if (isLowerBetter) {
+                                    // Para métricas donde menor es mejor (costos, gastos, etc.)
+                                    if (monthlyActual <= monthlyTarget) {
+                                        monthlyActualCell.classList.add('green');
+                                    } else if (monthlyActual <= monthlyTarget * 1.1) {
+                                        monthlyActualCell.classList.add('yellow');
+                                    } else {
+                                        monthlyActualCell.classList.add('red');
+                                    }
+                                } else {
+                                    // Para métricas donde mayor es mejor (ingresos, satisfacción, etc.)
+                                    if (monthlyActual >= monthlyTarget) {
+                                        monthlyActualCell.classList.add('green');
+                                    } else if (monthlyActual >= monthlyTarget * 0.9) {
+                                        monthlyActualCell.classList.add('yellow');
+                                    } else {
+                                        monthlyActualCell.classList.add('red');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Procesar celdas YTD
+                    if (ytdTargetCell && ytdActualCell) {
+                        const ytdTargetText = ytdTargetCell.textContent.trim();
+                        const ytdActualText = ytdActualCell.textContent.trim();
+                        
+                        if (ytdTargetText && ytdActualText) {
+                            const measureText = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                            const isLowerBetter = ytdTargetText.includes('$') || 
+                                                measureText.includes('cost') || 
+                                                measureText.includes('waste') ||
+                                                measureText.includes('desperdicio') ||
+                                                measureText.includes('gasto');
+                            
+                            const ytdTarget = parseFloat(ytdTargetText.replace(/[^0-9.-]+/g, ''));
+                            const ytdActual = parseFloat(ytdActualText.replace(/[^0-9.-]+/g, ''));
+                            
+                            // Limpiar clases anteriores
+                            ytdActualCell.classList.remove('green', 'yellow', 'red');
+                            
+                            if (!isNaN(ytdTarget) && !isNaN(ytdActual)) {
+                                if (isLowerBetter) {
+                                    // Para métricas donde menor es mejor (costos, gastos, etc.)
+                                    if (ytdActual <= ytdTarget) {
+                                        ytdActualCell.classList.add('green');
+                                    } else if (ytdActual <= ytdTarget * 1.1) {
+                                        ytdActualCell.classList.add('yellow');
+                                    } else {
+                                        ytdActualCell.classList.add('red');
+                                    }
+                                } else {
+                                    // Para métricas donde mayor es mejor (ingresos, satisfacción, etc.)
+                                    if (ytdActual >= ytdTarget) {
+                                        ytdActualCell.classList.add('green');
+                                    } else if (ytdActual >= ytdTarget * 0.9) {
+                                        ytdActualCell.classList.add('yellow');
+                                    } else {
+                                        ytdActualCell.classList.add('red');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Función para guardar los datos en localStorage
+        function saveData() {
+            const bscData = {
+                title: document.getElementById('bsc-title').value,
+                period: document.getElementById('bsc-period').value,
+                financial: getTableData('financial-table'),
+                customer: getTableData('customer-table'),
+                internal: getTableData('internal-table'),
+                innovation: getTableData('innovation-table')
+            };
+            
+            localStorage.setItem('bscData', JSON.stringify(bscData));
+            alert('Datos guardados correctamente.');
+        }
+        
+        // Función para obtener los datos de una tabla
+        function getTableData(tableId) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll('tbody tr');
+            const data = [];
+            
+            rows.forEach(row => {
+                const rowData = {
+                    strategy: row.querySelector('td:nth-child(1)').textContent,
+                    measure: row.querySelector('td:nth-child(2)').textContent,
+                    monthlyTarget: row.querySelector('td:nth-child(3)').textContent,
+                    monthlyActual: row.querySelector('td:nth-child(4)').textContent,
+                    ytdTarget: row.querySelector('td:nth-child(5)').textContent,
+                    ytdActual: row.querySelector('td:nth-child(6)').textContent
+                };
+                
+                data.push(rowData);
+            });
+            
+            return data;
+        }
+        
+        // Función para reiniciar el BSC
+        function resetBSC() {
+            if (confirm('¿Estás seguro de que deseas reiniciar el Balanced Scorecard? Se perderán todos los datos.')) {
+                const tables = ['financial-table', 'customer-table', 'internal-table', 'innovation-table'];
+                
+                tables.forEach(tableId => {
+                    const table = document.getElementById(tableId);
+                    const tbody = table.querySelector('tbody');
+                    
+                    // Dejar solo una fila vacía
+                    tbody.innerHTML = `
+                        <tr>
+                            <td contenteditable="true" class="editable strategy-cell"></td>
+                            <td contenteditable="true" class="editable"></td>
+                            <td contenteditable="true" class="editable target"></td>
+                            <td contenteditable="true" class="editable actual"></td>
+                            <td contenteditable="true" class="editable ytd-target"></td>
+                            <td contenteditable="true" class="editable ytd-actual"></td>
+                            <td><i class="fas fa-times btn-remove" onclick="removeRow(this)"></i></td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('bsc-title').value = 'Balanced Scorecard';
+                document.getElementById('bsc-period').value = new Date().toISOString().substring(0, 7);
+                
+                // Agregar eventos a las celdas editables nuevas
+                document.querySelectorAll('.editable').forEach(cell => {
+                    cell.addEventListener('blur', updateColors);
+                });
+            }
+        }
+        
+        // Función para imprimir el BSC
+        function printBSC() {
+            window.print();
+        }
+        
+        // Inicializar los colores al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aplicar colores iniciales
+            updateColors();
+            
+            // Agregar evento a todas las celdas editables para actualizar colores cuando cambie el contenido
+            document.querySelectorAll('.editable').forEach(cell => {
+                cell.addEventListener('blur', updateColors);
+            });
+        });
+    </script>
+</body>
